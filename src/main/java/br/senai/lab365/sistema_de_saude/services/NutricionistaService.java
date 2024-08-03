@@ -7,12 +7,19 @@ import br.senai.lab365.sistema_de_saude.repositories.NutricionistaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class NutricionistaService {
     @Autowired
     private NutricionistaRepository nutricionistaRepository;
 
     public NutricionistaResponseDTO criaNutricionista(NutricionistaRequestDTO nutricionistaRequest) {
+        // Verifica se já existe um nutricionista com o mesmo nome
+        Optional<Nutricionista> existingNutricionista = nutricionistaRepository.findByNome(nutricionistaRequest.getNome());
+        if (existingNutricionista.isPresent()) {
+            throw new RuntimeException("Nutricionista com o nome " + nutricionistaRequest.getNome() + " já existe.");
+        }
         Nutricionista nutricionista = new Nutricionista();
         nutricionista.setNome(nutricionistaRequest.getNome());
         nutricionista.setCrn(nutricionistaRequest.getCrn());
@@ -25,7 +32,13 @@ public class NutricionistaService {
 
     public NutricionistaResponseDTO atualizaNutricionista(Long id, NutricionistaRequestDTO nutricionistaRequest) {
         Nutricionista nutricionista = nutricionistaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nutricionista não encontrada " + id));
+                .orElseThrow(() -> new RuntimeException("Nutricionista não encontrado " + id));
+
+        // Verifica se já existe um nutricionista com o mesmo nome, excluindo o atual
+        Optional<Nutricionista> existingNutricionista = nutricionistaRepository.findByNome(nutricionistaRequest.getNome());
+        if (existingNutricionista.isPresent() && !existingNutricionista.get().getId().equals(id)) {
+            throw new RuntimeException("Nutricionista com o nome " + nutricionistaRequest.getNome() + " já existe.");
+        }
 
         nutricionista.setNome(nutricionistaRequest.getNome());
         nutricionista.setCrn(nutricionistaRequest.getCrn());

@@ -1,5 +1,6 @@
 package br.senai.lab365.sistema_de_saude.services;
 
+import br.senai.lab365.sistema_de_saude.dto.ConsultaListDTO;
 import br.senai.lab365.sistema_de_saude.dto.ConsultaRequestDTO;
 import br.senai.lab365.sistema_de_saude.dto.ConsultaResponseDTO;
 import br.senai.lab365.sistema_de_saude.models.Consulta;
@@ -10,6 +11,9 @@ import br.senai.lab365.sistema_de_saude.repositories.NutricionistaRepository;
 import br.senai.lab365.sistema_de_saude.repositories.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ConsultaService {
@@ -74,6 +78,12 @@ public class ConsultaService {
         return mapToConsultaResponse(consulta);
     }
 
+    public List<ConsultaListDTO> listaConsultas() {
+        List<Consulta> consultas = consultaRepository.findAll();
+
+        return consultas.stream().map(this::mapToConsultaListDTO).collect(Collectors.toList());
+    }
+
     private ConsultaResponseDTO mapToConsultaResponse(Consulta consulta) {
         ConsultaResponseDTO response = new ConsultaResponseDTO();
         response.setId(consulta.getId());
@@ -92,6 +102,15 @@ public class ConsultaService {
         } else {
             response.setPacienteId(null);
         }
+
+        return response;
+    }
+
+    private ConsultaListDTO mapToConsultaListDTO(Consulta consulta) {
+        ConsultaListDTO response = new ConsultaListDTO();
+        response.setData(consulta.getData());
+        response.setNutricionistaNome(consulta.getNutricionista().getNome());
+        response.setPacienteNome(consulta.getPaciente().getNome());
 
         return response;
     }
