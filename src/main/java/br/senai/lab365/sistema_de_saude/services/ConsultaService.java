@@ -114,4 +114,11 @@ public class ConsultaService {
 
         return response;
     }
+
+    public List<ConsultaResponseDTO> getAllConsultas() {
+        return consultaRepository.findAll()
+                                 .stream()
+                                 .map(this::mapToConsultaResponse)
+                                 .collect(Collectors.toList());
+    }
 }

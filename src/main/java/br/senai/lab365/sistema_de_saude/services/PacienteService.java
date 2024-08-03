@@ -7,6 +7,7 @@ import br.senai.lab365.sistema_de_saude.repositories.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,5 +67,11 @@ public class PacienteService {
         response.setEmail(paciente.getEmail());
 
         return response;
+    }
+
+    public List<PacienteResponseDTO> getAllPacientes() {
+        return pacienteRepository.findAll().stream()
+                .map(this::mapToPacienteResponse)
+                .toList();
     }
 }
